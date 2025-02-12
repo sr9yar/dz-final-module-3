@@ -169,3 +169,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+protected/
+response_examples/
+.DS_Store
+
