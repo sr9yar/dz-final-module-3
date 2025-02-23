@@ -69,7 +69,7 @@ def create_pdf():
 
   filename = "report_virustotal.pdf"
   dic = {
-    "title": "Отчет Virustotal PDF",
+    "title": "Отчет Virustotal [PDF]",
   }
 
   response.headers["Content-Type"] = "application/pdf; charset=UTF-8"
@@ -104,7 +104,7 @@ def create_pdf():
 
   filename = "report_vulners.pdf"
   dic = {
-    "title": "Отчет Vulners PDF",
+    "title": "Отчет Vulners [PDF]",
   }
 
   response.headers["Content-Type"] = "application/pdf; charset=UTF-8"
