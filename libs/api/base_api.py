@@ -3,6 +3,7 @@ import time
 import json
 import datetime
 import requests
+import os
 
 
 
@@ -17,6 +18,9 @@ class BaseApi:
   __headers = {}
   # Rate limiting delay (in milliseconds)
   __request_delay = 0 
+  # log requests
+  __log = int(os.getenv("LOG_REQUESTS", 0))
+
 
   def __init__(self, headers={}, request_delay=0):
     self.__headers = headers
@@ -24,7 +28,7 @@ class BaseApi:
 
 
 
-  def do_get(self, url):
+  def do_get(self, url) -> dict:
     """
     do get request 
     :returns: response
@@ -32,11 +36,15 @@ class BaseApi:
     self.__sleep_until_next()
     response = requests.get(url, headers=self.__headers)
     self.__update_next_time()
-    return self.__parse_response(response.text)
+    if self.__log == 1: print(f"\nGET {url}\n")
+    res = self.__parse_response(response.text)
+    if self.__log == 1: print(res)
+    if self.__log == 1: print("\n")
+    return res
 
 
 
-  def do_post(self, url, json_data=None, files=None, data=None):
+  def do_post(self, url, json_data=None, files=None, data=None) -> dict:
     """
     do post request 
     
@@ -46,7 +54,11 @@ class BaseApi:
     self.__sleep_until_next()
     response = requests.post(url, json=json_data, data=data, files=files, headers=self.__headers)
     self.__update_next_time()
-    return self.__parse_response(response.text)
+    if self.__log == 1: print(f"\nPOST {url}\n")
+    res = self.__parse_response(response.text)
+    if self.__log == 1: print(res)
+    if self.__log == 1: print("\n")
+    return res
 
 
 

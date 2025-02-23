@@ -28,7 +28,15 @@ class AppService:
     output = {}
 
     analyses = self.__virustotalApi.get_file_analyses(id)
-    output["detected"] = self.parse_virustotal_analyses(analyses)
+
+    if file_id is None:
+      file_id = self.__virustotalApi.extract_file_id(analyses)
+
+    detected, not_detected, comparison_list = self.parse_virustotal_analyses(analyses)
+
+    output["detected"] = detected
+    output["not_detected"] = not_detected
+    output["comparison_list"] = comparison_list
 
     summary = self.get_all_behaviors_summary_parsed(file_id)
     output = {**output, **summary}
@@ -98,6 +106,9 @@ class AppService:
       "dns_lookups": [],
     }
 
+    if not ("data" in result and "mitre_attack_techniques" in result["data"]):
+      return output
+
     for item in result["data"]["mitre_attack_techniques"]:
       output["attack_techniques"].append(item["id"])
     for item in result["data"]["dns_lookups"]:
@@ -117,6 +128,9 @@ class AppService:
       "data": result,
       "sandbox_names": [],
     }
+
+    if not "data" in result:
+      return output
 
     for item in result["data"]:
       output["sandbox_names"].append(item["attributes"]["sandbox_name"])
@@ -155,15 +169,27 @@ class AppService:
     results = res["data"]["attributes"]["results"]
     if results is None or len(results.keys()) == 0:
       print("WARN: no analyses has been received")
-      return []
+      return [{}, {}, {}]
+
+    comparison_list = {
+      "Fortinet": False,
+      "McAfee": False,
+      "Yandex": False,
+      "Sophos": False,
+    }
 
     detected = {}
+    not_detected = {}
     for key in results.keys():
       result = results[key]
 
       if result["category"] == "malicious":
         detected[key] = result["result"]
+        if key in comparison_list.keys():
+          comparison_list[key] = True
+      else:
+        not_detected[key] = result["category"]
 
-    return detected
+    return [detected, not_detected, comparison_list]
 
 

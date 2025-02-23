@@ -9,6 +9,7 @@ class VirustotalApi(BaseApi):
 
   """
 
+  __api_url = os.getenv("API_URL_VIRUSTOTAL", "")
 
 
   def __init__(self):
@@ -28,17 +29,17 @@ class VirustotalApi(BaseApi):
 
     :returns: id
     """
-    files = { "file": ("protected_archive.zip", open(f"{os.getcwd()}/protected/protected_archive.zip", "rb"), "application/zip") }
-    data = { "password": os.getenv("ZIP_PASSWORD") }
-    url = "https://www.virustotal.com/api/v3/files"
 
-    res = self.do_post(url, data=data, files=files)
+    with open(f"{os.getcwd()}/protected/protected_archive.zip", "rb") as file:   
+      files = { "file": ("protected_archive.zip", file, "application/zip") }
+
+      data = { "password": os.getenv("ZIP_PASSWORD") }
+      url = f"{self.__api_url}/api/v3/files"
+
+      res = self.do_post(url, data=data, files=files)
 
     id = res["data"]["id"]
-    file_id = None
-    if "file_info" in res["meta"]:
-      file_id = res["meta"]["file_info"]["sha256"]
-
+    file_id = self.extract_file_id(res)
     return (id, file_id)
 
 
@@ -50,7 +51,9 @@ class VirustotalApi(BaseApi):
     :param int id: file id analyses id, ex NjEyYjU3ZTJhZmU3MDY1ZWJlOTIxMzM3MTcwZGY3ZDQ6MTczODE4Mjg5Mg==
     :returns: report file
     """
-    url = f"https://www.virustotal.com/api/v3/analyses/{id}"
+    if id is None:
+      raise Exception("Argument 'id' is required")
+    url = f"{self.__api_url}/api/v3/analyses/{id}"
     return self.do_get(url)
 
 
@@ -65,8 +68,9 @@ class VirustotalApi(BaseApi):
     https://docs.virustotal.com/reference/files
     :returns: File object
     """
-
-    url = f"https://www.virustotal.com/api/v3/files/{id}"
+    if id is None:
+      raise Exception("Argument 'id' is required")
+    url = f"{self.__api_url}/api/v3/files/{id}"
     return self.do_get(url)
 
 
@@ -79,7 +83,9 @@ class VirustotalApi(BaseApi):
     :param id: file id, ex f4dc2e1abf2de55b455c7dfc0bbe66a9d12f7e857cd12f8408dadd7129946ae3
     :returns: response
     """
-    url = f"https://www.virustotal.com/api/v3/files/{id}/behaviour_summary"
+    if id is None:
+      raise Exception("Argument 'id' is required")
+    url = f"{self.__api_url}/api/v3/files/{id}/behaviour_summary"
     return self.do_get(url)
 
 
@@ -91,7 +97,9 @@ class VirustotalApi(BaseApi):
     :param id: file id, ex f4dc2e1abf2de55b455c7dfc0bbe66a9d12f7e857cd12f8408dadd7129946ae3
     :returns: response
     """
-    url = f"https://www.virustotal.com/api/v3/files/{id}/behaviours"
+    if id is None:
+      raise Exception("Argument 'id' is required")
+    url = f"{self.__api_url}/api/v3/files/{id}/behaviours"
     return self.do_get(url)
 
 
@@ -105,6 +113,20 @@ class VirustotalApi(BaseApi):
     :param id: file id
     :returns: response
     """
-    url = f"https://www.virustotal.com/api/v3/file_behaviours/{id}"
+    if id is None:
+      raise Exception("Argument 'id' is required")
+    url = f"{self.__api_url}/api/v3/file_behaviours/{id}"
     return self.do_get(url)
 
+
+  def extract_file_id(self, res):
+    """
+    Try to locate and extract file id in the response body
+    """
+    file_id = None
+    if "meta" in res and "file_info" in res["meta"]:
+      file_id = res["meta"]["file_info"]["sha256"]
+    else:
+      print("WARN: file_id is not found")
+    
+    return file_id

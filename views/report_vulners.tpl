@@ -26,13 +26,18 @@
     <div>
       Список CVE (Всего {{len(p["cve"])}}):
     </div>
+    <div>
+      <span class="subtitle">
+        Общедоступная информация по эксплойтам содержится по ссылкам.
+      </span>
+    <div>
   % end
 
   % if len(p["cve"]) > 0:
     <div class="mb-1">
       <ul class="font-small">
         % for v in p["cve"]:
-          <li>
+          <li class="mb-01">
             <a href="https://vulners.com/cve/{{v["id"]}}" title="{{v["title"]}}" target="_blank">
               {{ v["title"] }}
             </a>

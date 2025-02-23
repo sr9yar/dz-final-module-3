@@ -16,6 +16,9 @@
       .bold {
         font-weight: bold;
       }
+      .mb-01 {
+        margin-bottom: 0.1em;
+      }
       .mb-1 {
         margin-bottom: 1em;
       }
@@ -24,6 +27,9 @@
       }
       .color-red {
         color: red;
+      }
+      .color-green {
+        color: green;
       }
       .font-small {
         font-size: 0.7em;
@@ -34,6 +40,34 @@
       }
       ul li {
         margin-bottom: 0;
+      }
+      .flex {
+        display: flex;
+        width: 100%;
+
+      }
+      .flex > div {
+        min-width: 5em;
+        padding-right: 0.2em;
+        padding-bottom: 0.1em;
+      }
+
+      .w-5 {
+        width: 5em;
+      }
+      .w-10 {
+        width: 10em;
+      }
+      .w-15 {
+        width: 15em;
+      }
+      .w-20 {
+        width: 20em;
+      }
+      .subtitle {
+        color: gray;
+        font-style: italic;
+        font-size: 0.8em;
       }
 
     </style>

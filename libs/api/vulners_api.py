@@ -9,7 +9,9 @@ class VulnersApi(BaseApi):
 
   """
 
-  __apiKey = os.getenv("API_KEY_VULNERS", "")
+  __api_key = os.getenv("API_KEY_VULNERS", "")
+
+  __api_url = os.getenv("API_URL_VULNERS", "")
 
 
 
@@ -22,13 +24,13 @@ class VulnersApi(BaseApi):
 
 
   def do_search(self):
-    url = "https://vulners.com/api/v3/search/lucene/"
+    url = f"{self.__api_url}/api/v3/search/lucene/"
 
     query = "Cisco"
 
     data = {
       "query": query,
-      "apiKey": self.__apiKey,
+      "apiKey": self.__api_key,
     }
 
     return self.do_post(url, json_data=data)
@@ -39,8 +41,7 @@ class VulnersApi(BaseApi):
     """
     https://vulners.com/docs/api_reference/search_strategies/#get-vulnerabilitiesexploits-by-software-name-and-version
     """
-    url = "https://vulners.com/api/v3/burp/softwareapi/"
-    # url = "https://api-mock-1.0x100.ru/vulners.com/api/v3/burp/softwareapi/"
+    url = f"{self.__api_url}/api/v3/burp/softwareapi/"
   
     data = {
       "software": software, 
@@ -48,7 +49,7 @@ class VulnersApi(BaseApi):
       "type": "software", 
       "maxVulnerabilities": 5000,
       "only_ids": True,
-      "apiKey": self.__apiKey,
+      "apiKey": self.__api_key,
     }
 
     return self.do_post(url, json_data=data)
